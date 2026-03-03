@@ -5,20 +5,46 @@ namespace ToDo2.Views;
 
 public partial class MainPage : ContentPage
 {
-	TodoViewModel vm = new TodoViewModel();
+	TodoViewModel _vm;
+	bool usarFecha = false;
 
-	public MainPage()
+	public MainPage(TodoViewModel vm)
 	{
 		InitializeComponent();
 
-		ListaTareasView.ItemsSource = vm.TodoItems;
+		_vm = vm;
+
+		BindingContext = _vm;
+
+        ListaTareasView.ItemsSource = vm.TodoItems;
 	}
 
-	private void OnAgregarClicked(object sender, EventArgs e)
-	{
-		DateTime fechaSeleccionada = FechaFin.Date;
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        ListaTareasView.ItemsSource = _vm.TodoItems;
+    }
 
-		vm.Agregar(Tarea.Text, TareaNota.Text, fechaSeleccionada);
+    private void OnUsarFechaClicked(object sender, EventArgs e)
+	{
+		usarFecha = !usarFecha;
+
+		if (usarFecha)
+		{
+			FechaFin.IsVisible = true;
+		} else
+		{
+			FechaFin.IsVisible = false;
+		}
+	}
+
+    private void OnAgregarClicked(object sender, EventArgs e)
+	{
+		DateTime? fechaSeleccionada = FechaFin.Date != null ? FechaFin.Date : null; 
+
+		string tipoTarea = TipoTarea.SelectedItem?.ToString() ?? "Selecciona un tipo";
+
+        _vm.Agregar(Tarea.Text, TareaNota.Text, tipoTarea, usarFecha, fechaSeleccionada);
 		Tarea.Text = string.Empty;
 		TareaNota.Text = string.Empty;
 	}
@@ -29,7 +55,17 @@ public partial class MainPage : ContentPage
 
 		var tareaAEliminar = (TodoItem)boton.BindingContext;
 
-		vm.Eliminar(tareaAEliminar);
+		_vm.Eliminar(tareaAEliminar);
 	}
+
+    private void OnTareaEstadoChanged(object sender, CheckedChangedEventArgs e)
+    {
+        var cb = (CheckBox)sender;
+        var tarea = (TodoItem)cb.BindingContext;
+        if (tarea != null)
+        {
+            _vm.ActualizarEstadoTarea(tarea);
+        }
+    }
 
 }

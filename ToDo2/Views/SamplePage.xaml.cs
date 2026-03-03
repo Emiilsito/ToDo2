@@ -1,23 +1,27 @@
-﻿namespace ToDo2.Views;
+﻿using ToDo2.ViewModels;
+
+namespace ToDo2.Views;
 
 public partial class SamplePage : ContentPage
 {
-	int count = 0;
+    private readonly SamplePageViewModel _vm;
 
-	public SamplePage()
-	{
-		InitializeComponent();
-	}
+    public SamplePage(SamplePageViewModel vm)
+    {
+        InitializeComponent();
+        _vm = vm;
+        BindingContext = _vm;
+    }
 
-	private void OnCounterClicked(object sender, EventArgs e)
-	{
-		count++;
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
 
-		if (count == 1)
-			CounterBtn.Text = $"Clicked {count} time";
-		else
-			CounterBtn.Text = $"Clicked {count} times";
+        if (_vm != null)
+        {
+            _vm.ActualizarGrafica();
 
-		SemanticScreenReader.Announce(CounterBtn.Text);
-	}
+            graficaDonut.Chart = _vm.TareasPorTipo;
+        }
+    }
 }

@@ -4,78 +4,105 @@
 			 x:Class="ToDo2.Views.MainPage"
              BackgroundColor="#F2F2F2">
 
-    <VerticalStackLayout Padding="30" Spacing="15">
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="15">
 
-        <Entry x:Name="Tarea" Placeholder="¿Que tarea vas a agregar?" />
+            <Entry x:Name="Tarea" Placeholder="¿Que tarea vas a agregar?" />
 
-        <Entry x:Name="TareaNota" Placeholder="Nota (Opcional)" />
+            <Entry x:Name="TareaNota" Placeholder="Nota (Opcional)" />
 
-        <DatePicker x:Name="FechaFin" Format="dd/MM/yyyy HH:mm" />
+            <Picker x:Name="TipoTarea" VerticalOptions="Center" Title="Selecciona un titulo" ItemsSource="{Binding TiposTodo}" />
 
-        <Button Text="Agregar Tarea"
-                Clicked="OnAgregarClicked"
-                Background="Black"
-                TextColor="White"
-        />
-
-        <CollectionView x:Name="ListaTareasView" Margin="20">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
-            </CollectionView.ItemsLayout>
-
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame CornerRadius="10" 
-                   HasShadow="True" 
-                   BorderColor="#EEEEEE"
-                   Padding="15"
-                   Margin="5"
-                   BackgroundColor="White">
-                        <Grid ColumnDefinitions="*, Auto">
-                            
-                            <HorizontalStackLayout Spacing="15">
-                            <CheckBox IsChecked="{Binding Done}" 
-                              VerticalOptions="Center" 
-                              Color="Black" />
-
-                            <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                                <Label Text="{Binding Name}" 
-                               FontSize="18" 
-                               FontAttributes="Bold" 
-                               TextColor="#333333" />
-
-                                <Label Text="{Binding Nota}" 
-                               FontSize="14" 
-                               TextColor="#666666" />
-
-                                <Label Text="{Binding CreadoEn, StringFormat='Creado el {0:dd/MM/yyyy HH:mm}'}" 
-                               FontSize="10" 
-                               TextColor="Silver" 
-                               Margin="0,5,0,0" />
-
-                                <Label Text="{Binding FinalizadoEn, StringFormat='Vence: {0:dd/MM/yyyy}'}" 
-                               FontSize="12" 
-                               TextColor="DarkRed" 
-                               FontAttributes="Bold" />
-
-                            </VerticalStackLayout>
-                        </HorizontalStackLayout>
-
-                        <Button Grid.Column="1"
-                        Text="Eliminar"
-                        TextColor="White"
-                        BackgroundColor="Red"
-                        FontAttributes="Bold"
-                        CornerRadius="20"
-                        Clicked="OnEliminarClicked" />
-                        </Grid>
-
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+            <DatePicker x:Name="FechaFin" 
+            Format="dd/MM/yyyy" 
+            MinimumDate="01/01/2024"
+            IsVisible="False" />
 
 
-    </VerticalStackLayout>
+            <Button x:Name="BtnToggleFecha"
+                    Text="¿Usar Fecha?"
+                    Clicked="OnUsarFechaClicked"
+                    Background="Black"
+                    TextColor="White" />
+
+            <Button Text="Agregar Tarea"
+                    Clicked="OnAgregarClicked"
+                    Background="Black"
+                    TextColor="White"
+            />
+
+            <CollectionView x:Name="ListaTareasView" Margin="20">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border 
+                       Padding="15"
+                       Margin="5"
+                       BackgroundColor="White">
+                            <Grid ColumnDefinitions="*, Auto">
+
+                                <HorizontalStackLayout Spacing="15">
+                                    <CheckBox IsChecked="{Binding Done}" 
+                                  VerticalOptions="Center" 
+                                  Color="Black"
+                                  CheckedChanged="OnTareaEstadoChanged" />
+
+                                    <VerticalStackLayout VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" 
+                                   FontSize="18" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#333333" />
+
+                                        <Label Text="{Binding Nota}" 
+                                   FontSize="14" 
+                                   TextColor="#666666" 
+                                   IsVisible="{Binding Nota, TargetNullValue=False}"/>
+
+                                        <Label Text="{Binding Tipo}"
+                                               FontSize="12"
+                                                  TextColor="#007ACC"
+                                                    FontAttributes="Italic" />
+
+                                        <Label Text="{Binding CreadoEn, StringFormat='Creado el {0:dd/MM/yyyy HH:mm}'}" 
+                                   FontSize="10" 
+                                   TextColor="Silver" 
+                                   Margin="0,5,0,0"
+                                   />
+
+                                        <Label Text="{Binding FinalizadoEn, StringFormat='Vence: {0:dd/MM/yyyy}'}" 
+                                    FontSize="12" 
+                                    TextColor="Red" 
+                                    FontAttributes="Bold"
+                                    IsVisible="{Binding FinalizadoEn, TargetNullValue=False}"/>
+
+                                        <Label Text="{Binding FechaCompletado, StringFormat='Completada el {0:dd/MM/yyyy HH:mm}'}" 
+                                   FontSize="12" 
+                                   TextColor="#27AE60" 
+                                   FontAttributes="Italic"
+                                   IsVisible="{Binding Done}" />
+
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+
+                                <Button Grid.Column="1"
+                            Text="Eliminar"
+                            TextColor="White"
+                            BackgroundColor="Red"
+                            FontAttributes="Bold"
+                            CornerRadius="20"
+                            Clicked="OnEliminarClicked" />
+                            </Grid>
+
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+
+        </VerticalStackLayout>
+    </ScrollView>
 
 </ContentPage>

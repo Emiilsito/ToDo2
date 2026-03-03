@@ -1,4 +1,7 @@
-﻿namespace ToDo2;
+﻿using SkiaSharp.Views.Maui.Controls.Hosting;
+using ToDo2.ViewModels;
+
+namespace ToDo2;
 
 public static class MauiProgram
 {
@@ -8,6 +11,7 @@ public static class MauiProgram
 		builder
 			.UseMauiApp<App>()
 #if DEBUG
+			.UseSkiaSharp()
 			.UseDebugRainbows(new DebugRainbowsOptions { })
 #endif
 			.ConfigureFonts(fonts =>
@@ -22,7 +26,12 @@ public static class MauiProgram
 		builder.Logging.AddDebug();
 #endif
 		builder.Services.AddSingleton(CalendarStore.Default);
+        builder.Services.AddSingleton<TodoViewModel>();
+        builder.Services.AddSingleton<SamplePageViewModel>();
+        builder.Services.AddTransient<MainPage>();
+        builder.Services.AddTransient<Settings>();
+        builder.Services.AddTransient<SamplePage>();
 
-		return builder.Build();
+        return builder.Build();
 	}
 }

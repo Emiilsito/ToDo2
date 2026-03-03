@@ -16,5 +16,9 @@
 			Title="Sample"
 			Icon="iconsample.png"
 			ContentTemplate="{DataTemplate views:SamplePage}" />
-	</TabBar>
+        <ShellContent
+            Title="Settings"
+            Icon="iconsettings.png"
+            ContentTemplate="{DataTemplate views:Settings}" />
+    </TabBar>
 </Shell>
