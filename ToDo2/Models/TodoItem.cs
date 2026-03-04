@@ -1,16 +1,30 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace ToDo2.Models;
 
 public class TodoItem : BindableObject
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+    public int TareaCodigo { get; set; }
+    public string? Name { get; set; }
     public string? Nota { get; set; }
-    public bool Done { get; set; }
-    public string Tipo { get; set; }
+    private bool _done;
+    public bool Done
+    {
+        get => _done;
+        set
+        {
+            _done = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Progreso));
+            OnPropertyChanged(nameof(FechaCompletado));
+        }
+    }
+    public string? Tipo { get; set; }
     public DateTime CreadoEn { get; set; }
     public DateTime? FinalizadoEn { get; set; }
 
@@ -28,9 +42,18 @@ public class TodoItem : BindableObject
 
     public ObservableCollection<Subtarea> Subtareas { get; set; } = new();
 
-    public double Progreso => Subtareas.Count == 0 ?
-        (Done ? 1.0 : 0.0) :
-        (double)Subtareas.Count(s => s.Completada) / Subtareas.Count;
+    [JsonIgnore]
+    public double Progreso
+    {
+        get
+        {
+            if (Subtareas == null || Subtareas.Count == 0)
+            {
+                return Done ? 1.0 : 0.0;
+            }
+            return (double)Subtareas.Count(s => s.Completada) / Subtareas.Count;
+        }
+    }
 
     public void NotificarCambio()
     {
@@ -40,8 +63,8 @@ public class TodoItem : BindableObject
     }
 }
 
-public class Subtarea
+public class Subtarea : BindableObject
 {
-    public string Nombre { get; set; }
+    public string? Nombre { get; set; }
     public bool Completada { get; set; }
 }

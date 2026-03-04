@@ -1,23 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-			 x:Class="ToDo2.Views.MainPage"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ToDo2.Views.MainPage"
              BackgroundColor="#F2F2F2">
 
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="15">
 
             <Entry x:Name="Tarea" Placeholder="¿Que tarea vas a agregar?" />
-
             <Entry x:Name="TareaNota" Placeholder="Nota (Opcional)" />
-
-            <Picker x:Name="TipoTarea" VerticalOptions="Center" Title="Selecciona un titulo" ItemsSource="{Binding TiposTodo}" />
+            <Picker x:Name="TipoTarea" VerticalOptions="Center" Title="Tipo de tarea" ItemsSource="{Binding TiposTodo}" />
 
             <DatePicker x:Name="FechaFin" 
-            Format="dd/MM/yyyy" 
-            MinimumDate="01/01/2024"
-            IsVisible="False" />
-
+                        Format="dd/MM/yyyy" 
+                        MinimumDate="01/01/2024"
+                        IsVisible="False" />
 
             <Button x:Name="BtnToggleFecha"
                     Text="¿Usar Fecha?"
@@ -28,8 +25,7 @@
             <Button Text="Agregar Tarea"
                     Clicked="OnAgregarClicked"
                     Background="Black"
-                    TextColor="White"
-            />
+                    TextColor="White" />
 
             <CollectionView x:Name="ListaTareasView" Margin="20">
                 <CollectionView.ItemsLayout>
@@ -38,71 +34,92 @@
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Border 
-                       Padding="15"
-                       Margin="5"
-                       BackgroundColor="White">
-                            <Grid ColumnDefinitions="*, Auto">
+                        <Border Padding="15" Margin="5" BackgroundColor="White">
+                            <VerticalStackLayout Spacing="10">
 
-                                <HorizontalStackLayout Spacing="15">
-                                    <CheckBox IsChecked="{Binding Done}" 
-                                  VerticalOptions="Center" 
-                                  Color="Black"
-                                  CheckedChanged="OnTareaEstadoChanged" />
+                                <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="5">
+                                    <HorizontalStackLayout Grid.Column="0" Spacing="15">
+                                        <CheckBox IsChecked="{Binding Done}" 
+                                                  VerticalOptions="Center" 
+                                                  Color="Black"
+                                                  CheckedChanged="OnTareaEstadoChanged" />
 
-                                    <VerticalStackLayout VerticalOptions="Center">
-                                        <Label Text="{Binding Name}" 
-                                   FontSize="18" 
-                                   FontAttributes="Bold" 
-                                   TextColor="#333333" />
+                                        <VerticalStackLayout VerticalOptions="Center">
+                                            <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold" TextColor="#333333" />
+                                            <Label Text="{Binding Nota}" FontSize="14" TextColor="#666666" />
+                                            <Label Text="{Binding Tipo}" FontSize="12" TextColor="#007ACC" FontAttributes="Italic" />
+                                            <Label Text="{Binding CreadoEn, StringFormat='Creado el {0:dd/MM/yyyy HH:mm}'}" FontSize="10" TextColor="Silver" />
+                                            <Label Text="{Binding FinalizadoEn, StringFormat='Vence: {0:dd/MM/yyyy}'}" FontSize="12" TextColor="Red" FontAttributes="Bold" IsVisible="{Binding FinalizadoEn, TargetNullValue=False}"/>
+                                        </VerticalStackLayout>
+                                    </HorizontalStackLayout>
 
-                                        <Label Text="{Binding Nota}" 
-                                   FontSize="14" 
-                                   TextColor="#666666" 
-                                   IsVisible="{Binding Nota, TargetNullValue=False}"/>
+                                    <Button Grid.Column="1" 
+                                            Text="Agregar Subtarea" 
+                                            Clicked="OnAgregarSubtareaClicked" 
+                                            CommandParameter="{Binding .}"
+                                            HeightRequest="40"
+                                            Padding="10,0"
+                                            FontSize="11"
+                                            BackgroundColor="#EEEEEE" 
+                                            TextColor="Black"
+                                            CornerRadius="10" 
+                                            VerticalOptions="Center"/>
 
-                                        <Label Text="{Binding Tipo}"
-                                               FontSize="12"
-                                                  TextColor="#007ACC"
-                                                    FontAttributes="Italic" />
+                                    <Button Grid.Column="2" 
+                                            Text="Eliminar" 
+                                            TextColor="White" 
+                                            BackgroundColor="Red" 
+                                            FontAttributes="Bold" 
+                                            CornerRadius="10" 
+                                            HeightRequest="40"
+                                            VerticalOptions="Center"
+                                            Clicked="OnEliminarClicked" />
+                                </Grid>
 
-                                        <Label Text="{Binding CreadoEn, StringFormat='Creado el {0:dd/MM/yyyy HH:mm}'}" 
-                                   FontSize="10" 
-                                   TextColor="Silver" 
-                                   Margin="0,5,0,0"
-                                   />
+                                <Label Text="{Binding FechaCompletado, StringFormat='Completada el {0:dd/MM/yyyy HH:mm}'}" 
+                                       FontSize="12" 
+                                       TextColor="#27AE60" 
+                                       FontAttributes="Italic"
+                                       Margin="45,0,0,0"
+                                       IsVisible="{Binding Done}" />
 
-                                        <Label Text="{Binding FinalizadoEn, StringFormat='Vence: {0:dd/MM/yyyy}'}" 
-                                    FontSize="12" 
-                                    TextColor="Red" 
-                                    FontAttributes="Bold"
-                                    IsVisible="{Binding FinalizadoEn, TargetNullValue=False}"/>
+                                <VerticalStackLayout Margin="45,0,0,0" BindableLayout.ItemsSource="{Binding Subtareas}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="Auto, *, Auto" Margin="0,2">
+                                                <CheckBox Grid.Column="0" 
+                                                          IsChecked="{Binding Completada}" 
+                                                          Scale="0.8" 
+                                                          Color="Gray"
+                                                          CheckedChanged="OnSubtareaEstadoChanged" />
 
-                                        <Label Text="{Binding FechaCompletado, StringFormat='Completada el {0:dd/MM/yyyy HH:mm}'}" 
-                                   FontSize="12" 
-                                   TextColor="#27AE60" 
-                                   FontAttributes="Italic"
-                                   IsVisible="{Binding Done}" />
+                                                <Label Grid.Column="1" 
+                                                       Text="{Binding Nombre}" 
+                                                       FontSize="13" 
+                                                       VerticalOptions="Center" 
+                                                       TextColor="#444444" />
 
-                                    </VerticalStackLayout>
-                                </HorizontalStackLayout>
-
-                                <Button Grid.Column="1"
-                            Text="Eliminar"
-                            TextColor="White"
-                            BackgroundColor="Red"
-                            FontAttributes="Bold"
-                            CornerRadius="20"
-                            Clicked="OnEliminarClicked" />
-                            </Grid>
-
+                                                <Button Grid.Column="2" 
+                                                        Text="X" 
+                                                        TextColor="Red" 
+                                                        BackgroundColor="Transparent"
+                                                        FontSize="12"
+                                                        FontAttributes="Bold"
+                                                        WidthRequest="30"
+                                                        HeightRequest="30"
+                                                        Padding="0"
+                                                        Clicked="OnEliminarSubtareaClicked"
+                                                        CommandParameter="{Binding .}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

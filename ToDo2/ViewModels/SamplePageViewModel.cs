@@ -10,11 +10,9 @@ public class SamplePageViewModel : BindableObject
     private Chart _tareasPorTipo;
 
     public Chart TareasPorTipo { get => _tareasPorTipo; set { _tareasPorTipo = value; OnPropertyChanged(); } }
-
     public int CompletadasEsteMes { get; set; }
     public int CompletadasMesAnterior { get; set; }
     public string TipoMasCompletado { get; set; } = "---";
-
     public ObservableCollection<Models.TodoItem> MisTareas => _todoViewModel.TodoItems;
 
     public SamplePageViewModel(TodoViewModel todoViewModel)

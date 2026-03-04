@@ -26,6 +26,7 @@
             <Border StrokeShape="RoundRectangle 12" Padding="10" BackgroundColor="White">
                 <micro:ChartView x:Name="graficaDonut" Chart="{Binding TareasPorTipo}" HeightRequest="200" />
             </Border>
+           
 
             <Label Text="Progreso de Tareas" FontAttributes="Bold" FontSize="16" Margin="0,10,0,0"/>
 

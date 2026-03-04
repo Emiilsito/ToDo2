@@ -1,53 +1,81 @@
 ﻿using System.Collections.ObjectModel;
-using System.Text.Json;
 using ToDo2.Models;
+using ToDo2.Services;
 
 namespace ToDo2.ViewModels
 {
     public class TodoViewModel : BindableObject
     {
+        private readonly TodoService _todoService = new();
         public ObservableCollection<TodoItem> TodoItems { get; set; } = new();
         public ObservableCollection<string> TiposTodo { get; set; } = new();
 
         public TodoViewModel()
         {
-            CargarDesdeStorage();
+            CargarTiposDesdeStorage();
+            _ = CargarTareasAsync();
         }
 
-        public void Agregar(string tarea, string nota, string tipo, bool agregarFechaLimite, DateTime? fechaFin = null)
+        public async Task CargarTareasAsync()
+        {
+            try
+            {
+                var tareas = await _todoService.GetTareasAsync();
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    TodoItems.Clear();
+                    foreach (var item in tareas)
+                    {
+                        TodoItems.Add(item);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public async void Agregar(string tarea, string nota, string tipo, bool agregarFechaLimite, DateTime? fechaFin = null)
         {
             if (!string.IsNullOrWhiteSpace(tarea))
             {
-                TodoItems.Add(new TodoItem
+                var nuevo = new TodoItem
                 {
-                    Id = TodoItems.Count + 1,
                     CreadoEn = DateTime.Now,
                     Nota = nota,
                     Done = false,
                     Name = tarea,
                     Tipo = tipo,
                     FinalizadoEn = agregarFechaLimite ? fechaFin : null
-                });
-                GuardarEnStorage();
+                };
+
+                await _todoService.AddTareaAsync(nuevo);
+                await CargarTareasAsync();
             }
         }
 
-        public void Eliminar(TodoItem item)
+        public async Task Eliminar(TodoItem item)
         {
-            if (item != null && TodoItems.Contains(item))
+            if (item != null && item.TareaCodigo > 0)
             {
-                TodoItems.Remove(item);
-                GuardarEnStorage();
+                await _todoService.DeleteTareaAsync(item.TareaCodigo);
+
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    TodoItems.Remove(item);
+                });
             }
         }
 
-        public void ActualizarEstadoTarea(TodoItem item)
+        public async void ActualizarEstadoTarea(TodoItem item)
         {
             if (item == null) return;
 
             if (item.Done)
             {
-                item.FechaCompletado = DateTime.Now;
+                if (item.FechaCompletado == null)
+                    item.FechaCompletado = DateTime.Now;
             }
             else
             {
@@ -55,33 +83,30 @@ namespace ToDo2.ViewModels
             }
 
             item.NotificarCambio();
-            GuardarEnStorage();
+            await _todoService.UpdateTareaAsync(item);
         }
 
         public void GuardarEnStorage()
         {
-            string todoItems = JsonSerializer.Serialize(TodoItems);
-            Preferences.Default.Set("TodoItems", todoItems);
-
-            string tiposTodo = JsonSerializer.Serialize(TiposTodo);
+            string tiposTodo = System.Text.Json.JsonSerializer.Serialize(TiposTodo);
             Preferences.Default.Set("TiposTodo", tiposTodo);
         }
 
-        public void CargarDesdeStorage()
+        public void CargarTiposDesdeStorage()
         {
-            string todoItems = Preferences.Default.Get("TodoItems", "");
             string tiposTodo = Preferences.Default.Get("TiposTodo", "");
-
-            if (!string.IsNullOrEmpty(todoItems))
-            {
-                var items = JsonSerializer.Deserialize<List<TodoItem>>(todoItems);
-                TodoItems = new ObservableCollection<TodoItem>(items ?? new List<TodoItem>());
-            }
-
             if (!string.IsNullOrEmpty(tiposTodo))
             {
-                var tipos = JsonSerializer.Deserialize<List<string>>(tiposTodo);
+                var tipos = System.Text.Json.JsonSerializer.Deserialize<List<string>>(tiposTodo);
                 TiposTodo = new ObservableCollection<string>(tipos ?? new List<string>());
+            }
+        }
+
+        public async Task ActualizarTareaAsync(TodoItem item)
+        {
+            if (item != null)
+            {
+                await _todoService.UpdateTareaAsync(item);
             }
         }
     }
