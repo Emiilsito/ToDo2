@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using System.Collections.ObjectModel;
 using ToDo2.Models;
 using ToDo2.Services;
 
@@ -6,14 +7,41 @@ namespace ToDo2.ViewModels
 {
     public class TodoViewModel : BindableObject
     {
+        private HubConnection _hubConnection;
+
         private readonly TodoService _todoService = new();
         public ObservableCollection<TodoItem> TodoItems { get; set; } = new();
         public ObservableCollection<string> TiposTodo { get; set; } = new();
 
+        private 
+
         public TodoViewModel()
         {
+            ConfigurarSignalR();
             CargarTiposDesdeStorage();
             _ = CargarTareasAsync();
+            
+        }
+
+        private async void ConfigurarSignalR()
+        {
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:5088/todohub")
+                .WithAutomaticReconnect()
+                .Build();
+            _hubConnection.On("ReceiveRefresh", async () =>
+            {
+                await CargarTareasAsync();
+            });
+            try
+            {
+                await _hubConnection.StartAsync();
+                Console.WriteLine("Conexión SignalR establecida.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al conectar a SignalR: {ex.Message}");
+            }
         }
 
         public async Task CargarTareasAsync()
