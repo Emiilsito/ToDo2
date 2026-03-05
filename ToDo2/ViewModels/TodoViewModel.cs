@@ -24,7 +24,7 @@ namespace ToDo2.ViewModels
         private async void ConfigurarSignalR()
         {
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:5088/todohub")
+                .WithUrl("https://unossifying-condensible-lakenya.ngrok-free.dev")
                 .WithAutomaticReconnect()
                 .Build();
             _hubConnection.On("ReceiveRefresh", async () =>
