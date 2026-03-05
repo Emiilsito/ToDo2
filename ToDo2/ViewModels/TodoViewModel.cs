@@ -13,8 +13,6 @@ namespace ToDo2.ViewModels
         public ObservableCollection<TodoItem> TodoItems { get; set; } = new();
         public ObservableCollection<string> TiposTodo { get; set; } = new();
 
-        private 
-
         public TodoViewModel()
         {
             ConfigurarSignalR();
