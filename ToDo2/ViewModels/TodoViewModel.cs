@@ -52,6 +52,7 @@ namespace ToDo2.ViewModels
                     foreach (var item in tareas)
                     {
                         TodoItems.Add(item);
+                        TiposTodo.Add(item.Tipo);
                     }
                 });
             }
