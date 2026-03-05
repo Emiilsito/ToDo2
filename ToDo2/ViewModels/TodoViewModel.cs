@@ -24,7 +24,7 @@ namespace ToDo2.ViewModels
         private async void ConfigurarSignalR()
         {
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl("https://unossifying-condensible-lakenya.ngrok-free.dev")
+                .WithUrl("https://unossifying-condensible-lakenya.ngrok-free.dev/todohub")
                 .WithAutomaticReconnect()
                 .Build();
             _hubConnection.On("ReceiveRefresh", async () =>
@@ -132,6 +132,8 @@ namespace ToDo2.ViewModels
         {
             if (item != null)
             {
+                item.NotificarCambio();
+
                 await _todoService.UpdateTareaAsync(item);
             }
         }
