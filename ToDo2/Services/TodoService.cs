@@ -6,9 +6,7 @@ namespace ToDo2.Services
     public class TodoService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl = DeviceInfo.Platform == DevicePlatform.Android
-                                            ? "http://10.0.2.2:5088"
-                                            : "http://localhost:5088";
+        private readonly string _baseUrl = "https://unossifying-condensible-lakenya.ngrok-free.dev/todoitems";
 
         public TodoService()
         {

@@ -15,10 +15,9 @@ namespace ToDo2.ViewModels
 
         public TodoViewModel()
         {
-            ConfigurarSignalR();
             CargarTiposDesdeStorage();
             _ = CargarTareasAsync();
-            
+            ConfigurarSignalR();
         }
 
         private async void ConfigurarSignalR()
