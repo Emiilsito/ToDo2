@@ -37,11 +37,11 @@ public partial class MainPage : ContentPage
         TareaNota.Text = string.Empty;
     }
 
-    private void OnEliminarClicked(object sender, EventArgs e)
+    private async void OnEliminarClicked(object sender, EventArgs e)
     {
         var boton = (Button)sender;
         var tareaAEliminar = (TodoItem)boton.BindingContext;
-        _vm.Eliminar(tareaAEliminar);
+        await _vm.Eliminar(tareaAEliminar);
     }
 
     private void OnTareaEstadoChanged(object sender, CheckedChangedEventArgs e)
